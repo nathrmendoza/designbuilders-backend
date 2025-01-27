@@ -49,7 +49,12 @@ class Router
         }
 
         foreach ($middlewares as $middleware) {
-            $instance = new $middleware();
+            if (is_object($middleware)) {
+                $instance = $middleware;
+            } else {
+                $instance = new $middleware();
+            }
+
             if (!$instance->execute()) {
                 return '';
             }

@@ -7,19 +7,26 @@ namespace App\Middleware;
 use App\Core\IMiddleware;
 use App\Core\Application;
 
-class AuthMiddleware implements IMiddleware
-{
+class RoleMiddleware implements IMiddleware {
+    private array $allowedRoles;
+
+    public function __construct(array $allowedRoles) {
+        $this->allowedRoles = $allowedRoles;
+    }
+
     public function execute(): bool {
 
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        //not logged in
-        if(!isset($_SESSION['user_id'])) {
+        $userRole = $_SESSION['user_role'];
+
+        if (!in_array($userRole, $this->allowedRoles)) {
             Application::getInstance()
                 ->getResponse()
-                ->redirect('/login');
+                ->redirect('/unauthorized');
+
             return false;
         }
 

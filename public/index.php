@@ -6,6 +6,8 @@ ini_set('display_errors', '1');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Core\Role;
+
 //load env variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
@@ -23,8 +25,10 @@ $router->post('/register', [App\Controllers\AuthController::class, 'register']);
 $router->get('/logout', [App\Controllers\AuthController::class, 'logout']);
 
 //protected routes
-$router->get('/dashboard', [App\Controllers\DashboardController::class, 'index'],
-    [App\Middleware\AuthMiddleware::class]
+$router->get('/dashboard', [App\Controllers\DashboardController::class, 'index'], [
+        App\Middleware\AuthMiddleware::class,
+        new App\Middleware\RoleMiddleware([Role::ADMIN, Role::EDITOR]) //just example of using role middleware
+    ]
 );
 
 $app->run();
