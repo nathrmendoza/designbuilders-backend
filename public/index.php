@@ -15,12 +15,16 @@ $app = new App\Core\Application();
 
 $router = $app->getRouter();
 
-//register routes
+//auth routes
 $router->get('/login', [App\Controllers\AuthController::class, 'login']);
 $router->post('/login', [App\Controllers\AuthController::class, 'login']);
 $router->get('/register', [App\Controllers\AuthController::class, 'register']);
 $router->post('/register', [App\Controllers\AuthController::class, 'register']);
 $router->get('/logout', [App\Controllers\AuthController::class, 'logout']);
 
+//protected routes
+$router->get('/dashboard', [App\Controllers\DashboardController::class, 'index'],
+    [App\Middleware\AuthMiddleware::class]
+);
 
 $app->run();

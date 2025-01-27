@@ -24,24 +24,35 @@ class Router
      *  ]
      * ]
      */
+    private array $middlewares = [];
 
 
     //ROUTES REGISTER
-    public function get(string $path, array $callback): void {
+    public function get(string $path, array $callback, array $middlewares = []): void {
         $this->routes['get'][$path] = $callback;
+        $this->middlewares['get'][$path] = $middlewares;
     }
 
-    public function post(string $path, array $callback): void {
+    public function post(string $path, array $callback, array $middlewares = []): void {
         $this->routes['post'][$path] = $callback;
+        $this->middlewares['post'][$path] = $middlewares;
     }
 
     public function resolve(): mixed {
         $path = $_SERVER['REQUEST_URI'] ?? '/';
         $method = strtolower($_SERVER['REQUEST_METHOD']);
         $callback = $this->routes[$method][$path] ?? false;
+        $middlewares = $this->middlewares[$method][$path] ?? [];
 
         if (!$callback) {
             throw new \Exception('Page not found', 404);
+        }
+
+        foreach ($middlewares as $middleware) {
+            $instance = new $middleware();
+            if (!$instance->execute()) {
+                return '';
+            }
         }
 
         if (is_array($callback)) {

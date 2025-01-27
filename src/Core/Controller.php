@@ -9,9 +9,4 @@ abstract class Controller
     protected function render(string $view, array $params = []): string {
         return (new View($view, $params))->render();
     }
-
-    protected function json(array $data): string {
-        header('Content-Type: application/json');
-        return json_encode($data);
-    }
 }
