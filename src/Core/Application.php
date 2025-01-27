@@ -7,19 +7,23 @@ class Application
 {
     private Router $router;
     private Database $database;
+    private Response $response;
     private static Application $instance;
 
     public function __construct() {
         self::$instance = $this;
         $this->router = new Router();
         $this->database = new Database();
+        $this->response = new Response();
     }
 
     public function run(): void {
         try {
-            $this->router->resolve();
-        } catch(\Exception $e) {
-            echo $e->getMessage();
+            $content = $this->router->resolve();
+            $this->response->send($content);
+        } catch (\Exception $e) {
+            $this->response->setStatusCode(500);
+            $this->response->send($e->getMessage());
         }
     }
 
@@ -33,5 +37,9 @@ class Application
 
     public function getDatabase(): Database {
         return $this->database;
+    }
+
+    public function getResponse(): Response {
+        return $this->response;
     }
 }
